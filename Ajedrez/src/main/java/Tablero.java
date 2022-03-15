@@ -9,5 +9,5 @@
  * @author david
  */
 public class Tablero {
-    
+    public Tablero(){}
 }
