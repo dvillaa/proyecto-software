@@ -14,7 +14,7 @@ import java.net.Socket;
  * @author david
  */
 public class Cliente {
-    final String HOST = "";
+    final String HOST = "localhost";
     final int PUERTO = 5500;
     DataInputStream in;
     DataOutputStream out;
