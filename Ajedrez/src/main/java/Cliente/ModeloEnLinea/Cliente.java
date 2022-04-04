@@ -14,22 +14,29 @@ import java.net.Socket;
  * @author david
  */
 public class Cliente {
-    final String HOST = "localhost";
+    final String HOST = "10.1.64.61";
     final int PUERTO = 5500;
     DataInputStream in;
     DataOutputStream out;
     
-    public Cliente() throws IOException {
+    
+    public Cliente(boolean truno) throws IOException {
         Socket sc = new Socket(HOST, PUERTO);
         
         in = new DataInputStream(sc.getInputStream());
         out = new DataOutputStream(sc.getOutputStream());
         
-        out.writeUTF("Hola desde el cliente");
+        out.writeUTF("Hola desde el cliente" + truno);
         
         String mensaje = in.readUTF();
         
         System.out.println(mensaje);
+        if (truno){
+            for (int i = 0; i < 100; i++){
+
+               out.writeUTF("Hola");
+            }
+        }
         
         sc.close();
         

@@ -14,10 +14,13 @@ public class Prueba {
 
     /**
      * @param args the command line arguments
+     * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
-        Cliente cliente = new Cliente();
+        Cliente cliente2 = new Cliente(true);
+        Cliente cliente = new Cliente(false);
+
     }
     
 }
