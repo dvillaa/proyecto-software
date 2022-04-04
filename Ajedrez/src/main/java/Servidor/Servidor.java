@@ -15,44 +15,88 @@ import java.io.InputStreamReader;
  *
  * @author carlo
  */
-public class Servidor extends Conexion //Se hereda de conexión para hacer uso de los sockets y demás
-{
-    public Servidor() throws IOException{super("servidor");} //Se usa el constructor para servidor de Conexion
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-    public void startServer()//Método para iniciar el servidor
-    {
-        try
-        {
-            System.out.println("Esperando..."); //Esperando conexión
+public class Servidor {
+
+    public static void main(String[] args) {
+         
+        try {
+            int puerto = 5000;
+            ServerSocket sc = new ServerSocket(puerto);
+            System.out.println("Servidor iniciado");
+            
             while(true){
-                cs = ss.accept(); //Accept comienza el socket y espera una conexión desde un cliente
-
-                System.out.println("Cliente en línea");
-
-                //Se obtiene el flujo de salida del cliente para enviarle mensajes
-                salidaCliente = new DataOutputStream(cs.getOutputStream());
-
-                //Se le envía un mensaje al cliente usando su flujo de salida
-                salidaCliente.writeUTF("Petición recibida y aceptada");
-
-                //Se obtiene el flujo entrante desde el cliente
-                BufferedReader entrada = new BufferedReader(new InputStreamReader(cs.getInputStream()));
-
-                while((mensajeServidor = entrada.readLine()) != null) //Mientras haya mensajes desde el cliente
-                {
-                    //Se muestra por pantalla el mensaje recibido
-                    System.out.println(mensajeServidor);
-                }
-
-                System.out.println("Fin de la conexión");
-
-                ss.close();//Se finaliza la conexión con el cliente
+                Socket socketCliente = sc.accept();
+                Conexion x = new Conexion(socketCliente);
             }
+            
+        } catch (IOException ex) {
+            System.out.println("Escuchando:" + ex.getMessage());
         }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
+          
     }
 }
+
+class Conexion extends Thread{
+    DataInputStream in;
+    DataOutputStream out;
+    ObjectOutputStream outVector;
+    ObjectInputStream inVector;
+    Socket socketCliente;
+    String[] num = new String[4];
+    int servicio;
+    int inicio;
+    int fin;
+    int[] primos = new int[10000000];
+    int resultado;
+    
+    public Conexion(Socket aSocketCliente){
+        
+        try{
+            socketCliente = aSocketCliente;
+            in = new DataInputStream(socketCliente.getInputStream());
+            out = new DataOutputStream(socketCliente.getOutputStream());
+            outVector = new ObjectOutputStream(socketCliente.getOutputStream());
+            inVector = new ObjectInputStream(socketCliente.getInputStream());
+            this.start();
+        } catch(IOException ex){
+            System.out.println("Conexion:" + ex.getMessage());
+        }
+       
+    }
+    
+    @Override
+    public void run(){
+        try{
+            num = (String[])inVector.readObject();
+            servicio = Integer.parseInt(num[1]);
+            inicio = Integer.parseInt(num[2]);
+            fin = Integer.parseInt(num[3]);
+            System.out.println("Servicio: " + num[1]);
+            System.out.println("Rango: " + num[2] + " " + num[3]);
+            
+            if(servicio == 0){
+                resultado = cuenta_primos(inicio, fin);
+                System.out.println("Numero de primos: " + resultado);
+                out.writeInt(resultado);
+            } else if(servicio == 1){
+                resultado = encuentra_primos(inicio, fin, primos);
+                System.out.println("Numero de primos: " + resultado);
+                out.writeInt(resultado);
+                outVector.writeObject(primos);
+            }
+            socketCliente.close();
+        } catch(Exception ex){
+            System.out.println("IO:" + ex.getMessage());
+        }
+    }
 
