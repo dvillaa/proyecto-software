@@ -23,6 +23,7 @@ public class ServidorThread extends Thread{
     ObjectInputStream inVector;
     Socket socketCliente;
     int numCliente = 1;
+    String mesaje;
     
     public ServidorThread(Socket aSocketCliente){
         
@@ -30,7 +31,6 @@ public class ServidorThread extends Thread{
             socketCliente = aSocketCliente;
             in = new DataInputStream(socketCliente.getInputStream());
             out = new DataOutputStream(socketCliente.getOutputStream());
-            this.start();
         } catch(IOException ex){
             System.out.println("Conexion:" + ex.getMessage());
         }
@@ -43,6 +43,9 @@ public class ServidorThread extends Thread{
             out.writeUTF("Conexion aceptada cliente " + numCliente);
             numCliente++;
             System.out.println(in.readUTF());
+            while((mesaje = in.readUTF()) != null){
+                System.out.println(mesaje);
+            }
             socketCliente.close();
         } catch(Exception ex){
             System.out.println("IO:" + ex.getMessage());

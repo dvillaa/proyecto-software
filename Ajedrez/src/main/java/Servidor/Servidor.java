@@ -28,6 +28,7 @@ public class Servidor {
             while(true){
                 Socket socketCliente = sc.accept();
                 ServidorThread x = new ServidorThread(socketCliente);
+                x.start();
             }
             
         } catch (IOException ex) {
